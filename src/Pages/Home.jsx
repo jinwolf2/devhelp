@@ -43,12 +43,12 @@ export default function Home() {
               Genera tipos TS a partir de tus objetos JSON.
             </p>
           </Link>
-          <div className="p-6 border border-gray-700 rounded hover:border-[#007acc] transition">
+          <Link to="/tools/f/CSSJSmini" className="p-6 border border-gray-700 rounded hover:border-[#007acc] transition">
             <h3 className="text-xl font-semibold mb-3 text-[#d4d4d4]">Minificador de CSS/JS</h3>
             <p className="text-sm text-gray-300">
               Optimiza tus archivos para una carga más rápida.
             </p>
-          </div>
+          </Link>
         </div>
       </section>
 
