@@ -14,6 +14,7 @@ import HashGenerator from './Pages/HashGenerator'
 import SQLJSONConverter from './Pages/SQLJSONConverter'
 import UUIDGenerator from './Pages/UUIDGenerator'
 import DockerfileGenerator from './Pages/DockerfileGenerator'
+import Documentation from './Pages/Documentation'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -37,6 +38,7 @@ function App() {
           <Route path='/tools/b/SQLtoJSON' element={<SQLJSONConverter/>}/>
           <Route path='/tools/b/UUIDGenerator' element={<UUIDGenerator/>}/>
           <Route path='/tools/b/DockerTemplateGen' element={<DockerfileGenerator/>}/>
+          <Route path='/docs' element={<Documentation/>}/>
         </Routes>
         <Footer/>
       </BrowserRouter>
