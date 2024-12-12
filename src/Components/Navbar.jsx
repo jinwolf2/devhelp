@@ -12,7 +12,6 @@ export default function NavBar() {
           <Link to="/" className="hover:text-[#007acc] transition">Inicio</Link>
           <Link to="/tools" className="hover:text-[#007acc] transition">Herramientas</Link>
           <Link to="/docs" className="hover:text-[#007acc] transition">Docs</Link>
-          <Link to="/contact" className="hover:text-[#007acc] transition">Contacto</Link>
         </nav>
       </div>
     </header>
