@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NavBar from './Components/Navbar';
 import Footer from './Components/Footer';
 import Documentation from './Pages/Documentation';
+import Apoyo from './Pages/Apoyo';
 
 // Lazy loading de componentes
 const Home = React.lazy(() => import('./Pages/Home'));
@@ -38,7 +39,7 @@ export default function App() {
             <Route path="/tools/b/UUIDGenerator" element={<UUIDGenerator />} />
             <Route path="/tools/b/DockerTemplateGen" element={<DockerfileGenerator />} />
             <Route path="/docs" element={<Documentation />} />
-            <Route path="/support" element={<Documentation />} />
+            <Route path="/support" element={<Apoyo />} />
           </Routes>
         </Suspense>
         <Footer />
