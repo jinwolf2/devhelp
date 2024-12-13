@@ -38,6 +38,7 @@ export default function App() {
             <Route path="/tools/b/UUIDGenerator" element={<UUIDGenerator />} />
             <Route path="/tools/b/DockerTemplateGen" element={<DockerfileGenerator />} />
             <Route path="/docs" element={<Documentation />} />
+            <Route path="/support" element={<Documentation />} />
           </Routes>
         </Suspense>
         <Footer />

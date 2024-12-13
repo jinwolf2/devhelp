@@ -33,6 +33,7 @@ export default function NavBar() {
           <Link to="/" className="hover:text-[#007acc] transition">Inicio</Link>
           <Link to="/tools" className="hover:text-[#007acc] transition">Herramientas</Link>
           <Link to="/docs" className="hover:text-[#007acc] transition">Docs</Link>
+          <Link to="/support" className="hover:text-[#007acc] transition">Apoyo</Link>
         </nav>
       </div>
 
@@ -48,6 +49,9 @@ export default function NavBar() {
             </Link>
             <Link to="/docs" className="block hover:text-[#007acc] transition" onClick={() => setIsMobileMenuOpen(false)}>
               Docs
+            </Link>
+            <Link to="/support" className="block hover:text-[#007acc] transition" onClick={() => setIsMobileMenuOpen(false)}>
+              Apoyo
             </Link>
           </nav>
         </div>
