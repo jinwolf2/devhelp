@@ -141,7 +141,7 @@ export default function GradientGenerator() {
     },
   },
 };`)}
-          className="mt-4 w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition self-end"
+          className="mt-4 w-full md:w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition self-end"
         >
           {copied ? 'Copiado!' : 'Copiar Configuración'}
         </button>
@@ -161,7 +161,7 @@ export default function GradientGenerator() {
         </div>
         <button
           onClick={() => copyToClipboard(exportToCSS())}
-          className="mt-4 w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition self-end"
+          className="mt-4 w-full md:w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition self-end"
         >
           {copied ? 'Copiado!' : 'Copiar CSS'}
         </button>
