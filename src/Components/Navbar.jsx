@@ -7,7 +7,7 @@ export default function NavBar() {
   return (
     <header className="w-full border-b border-gray-700">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="text-xl font-semibold text-[#007acc] hover:opacity-90">
+        <Link to="/" className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-bl from-blue-500 to-cyan-200 hover:opacity-90">
           devhelp.dev
         </Link>
         <button

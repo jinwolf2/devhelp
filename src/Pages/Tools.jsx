@@ -54,22 +54,23 @@ export default function Tools() {
       </div>
 
       {/* Grid de Herramientas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {toolsToDisplay.map((tool, index) => (
-          <Link
-            to={tool.path}
-            key={index}
-            className="p-6 border border-gray-700 rounded hover:border-[#007acc] transition min-h-[250px] flex flex-col cursor-pointer"
-          >
-            <h3 className="text-xl font-semibold mb-3 text-[#d4d4d4]">
-              {tool.name}
-            </h3>
-            <p className="text-sm text-gray-300 line-clamp-3 overflow-hidden">
-              {tool.description}
-            </p>
-          </Link>
-        ))}
-      </div>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+  {toolsToDisplay.map((tool, index) => (
+    <Link
+      to={tool.path}
+      key={index}
+      className="p-6 border border-gray-700 rounded-lg hover:border-[#007acc] transition backdrop-blur-md bg-white/10 shadow-lg shadow-gray-900/50 hover:shadow-[#007acc]/50 min-h-[250px] flex flex-col cursor-pointer"
+    >
+      <h3 className="text-xl font-semibold mb-3 text-white">
+        {tool.name}
+      </h3>
+      <p className="text-sm text-gray-200 line-clamp-3 overflow-hidden">
+        {tool.description}
+      </p>
+    </Link>
+  ))}
+</div>
+
     </div>
   );
 }

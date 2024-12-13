@@ -3,9 +3,9 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export default function GradientGenerator() {
-  const [gradientType, setGradientType] = useState('linear'); // 'linear' o 'radial'
-  const [angle, setAngle] = useState(90); // Ángulo para gradiente lineal
-  const [colors, setColors] = useState(['#007ACC']); // Colores iniciales
+  const [gradientType, setGradientType] = useState('linear');
+  const [angle, setAngle] = useState(90);
+  const [colors, setColors] = useState(['#007ACC']);
   const [copied, setCopied] = useState(false);
 
   const handleColorChange = (color, index) => {
@@ -15,7 +15,7 @@ export default function GradientGenerator() {
   };
 
   const addColor = () => {
-    setColors([...colors, '#FFFFFF']); // Agrega un nuevo color predeterminado
+    setColors([...colors, '#FFFFFF']);
   };
 
   const removeColor = (index) => {
@@ -41,9 +41,9 @@ export default function GradientGenerator() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16 text-[#d4d4d4]" style={{ backgroundColor: '#1e1e1e' }}>
-      <h1 className="text-3xl font-bold mb-6 text-center md:text-left">Gradient Generator</h1>
-      <p className="text-gray-300 mb-8 text-center md:text-left">
+    <div className="max-w-6xl mx-auto px-4 py-16 text-[#d4d4d4] sm:px-6 lg:px-8" style={{ backgroundColor: '#1e1e1e' }}>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center lg:text-left">Gradient Generator</h1>
+      <p className="text-gray-300 mb-8 text-center lg:text-left">
         Crea gradientes personalizados con colores dinámicos y expórtalos a TailwindCSS o CSS.
       </p>
 
@@ -53,7 +53,7 @@ export default function GradientGenerator() {
         <select
           value={gradientType}
           onChange={(e) => setGradientType(e.target.value)}
-          className="w-full md:w-auto bg-[#252526] text-gray-200 border border-gray-600 rounded px-4 py-2 focus:border-[#007ACC] focus:outline-none"
+          className="w-full sm:w-auto bg-[#252526] text-gray-200 border border-gray-600 rounded px-4 py-2 focus:border-[#007ACC] focus:outline-none"
         >
           <option value="linear">Lineal</option>
           <option value="radial">Radial</option>
@@ -65,7 +65,7 @@ export default function GradientGenerator() {
               type="number"
               value={angle}
               onChange={(e) => setAngle(e.target.value)}
-              className="w-full md:w-32 px-4 py-2 rounded bg-[#252526] text-gray-200 border border-gray-600 focus:border-[#007ACC] focus:outline-none"
+              className="w-full sm:w-32 px-4 py-2 rounded bg-[#252526] text-gray-200 border border-gray-600 focus:border-[#007ACC] focus:outline-none"
               min="0"
               max="360"
             />
@@ -78,16 +78,16 @@ export default function GradientGenerator() {
         <h2 className="text-xl font-bold mb-4">Selecciona los colores</h2>
         <div className="flex flex-wrap gap-4">
           {colors.map((color, index) => (
-            <div key={index} className="flex flex-col items-center w-1/2 md:w-auto">
+            <div key={index} className="flex flex-col items-center w-1/2 sm:w-auto">
               <input
                 type="color"
                 value={color}
                 onChange={(e) => handleColorChange(e.target.value, index)}
-                className="w-20 h-20 border-0 cursor-pointer"
+                className="w-16 h-16 sm:w-20 sm:h-20 border-0 cursor-pointer"
               />
               <button
                 onClick={() => removeColor(index)}
-                className="mt-2 bg-red-600 text-white px-4 py-1 rounded text-sm hover:bg-red-500 transition w-full"
+                className="mt-2 bg-red-600 text-white px-4 py-1 rounded text-xs sm:text-sm hover:bg-red-500 transition w-full"
               >
                 Eliminar
               </button>
@@ -96,7 +96,7 @@ export default function GradientGenerator() {
         </div>
         <button
           onClick={addColor}
-          className="mt-4 px-4 py-2 rounded bg-[#007ACC] text-white text-sm hover:bg-[#0587d6] transition w-full md:w-auto"
+          className="mt-4 px-4 py-2 rounded bg-[#007ACC] text-white text-sm hover:bg-[#0587d6] transition w-full sm:w-auto"
         >
           Añadir Color
         </button>
@@ -141,7 +141,7 @@ export default function GradientGenerator() {
     },
   },
 };`)}
-          className="mt-4 w-full md:w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition self-end"
+          className="mt-4 w-full sm:w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition"
         >
           {copied ? 'Copiado!' : 'Copiar Configuración'}
         </button>
@@ -161,7 +161,7 @@ export default function GradientGenerator() {
         </div>
         <button
           onClick={() => copyToClipboard(exportToCSS())}
-          className="mt-4 w-full md:w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition self-end"
+          className="mt-4 w-full sm:w-48 px-4 py-2 rounded bg-green-600 text-white text-sm hover:bg-green-500 transition"
         >
           {copied ? 'Copiado!' : 'Copiar CSS'}
         </button>
