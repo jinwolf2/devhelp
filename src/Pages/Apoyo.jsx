@@ -18,7 +18,7 @@ export default function Apoyo() {
           />
           <h2 className="text-xl font-semibold mb-2">Billetera Stellar Lumens</h2>
           <p className="bg-[#252526] text-gray-200 px-4 w-auto py-2 rounded border border-gray-600 text-sm">
-          GAKZXJVMXJ6GEYN666WNK5ROHWLWK7Q3EQNWIWN3TEAHWDCNXGRGEGIP
+            GAKZXJVMXJ6GEYN666WNK5ROHWLWK7Q3EQNWIWN3TEAHWDCNXGRGEGIP
           </p>
         </div>
 
@@ -27,7 +27,6 @@ export default function Apoyo() {
           className="px-6 py-2 bg-[#007acc] text-white rounded hover:bg-[#0587d6] transition text-lg"
         >
           Copiar Dirección
-          
         </button>
 
         <p className="mt-6 text-gray-400 text-sm text-center max-w-lg">
