@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NavBar from './Components/Navbar';
 import Footer from './Components/Footer';
+import Documentation from './Pages/Documentation';
 
 // Lazy loading de componentes
 const Home = React.lazy(() => import('./Pages/Home'));
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/tools/b/SQLtoJSON" element={<SQLJSONConverter />} />
             <Route path="/tools/b/UUIDGenerator" element={<UUIDGenerator />} />
             <Route path="/tools/b/DockerTemplateGen" element={<DockerfileGenerator />} />
+            <Route path="/docs" element={<Documentation />} />
           </Routes>
         </Suspense>
         <Footer />
