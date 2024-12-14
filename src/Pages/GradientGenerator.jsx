@@ -41,7 +41,7 @@ export default function GradientGenerator() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16 text-[#d4d4d4] sm:px-6 lg:px-8" style={{ backgroundColor: '#1e1e1e' }}>
+    <div className="w-full sm:w-96  mx-auto px-4 py-16 sm:px-6 lg:px-8 text-[#d4d4d4]" style={{ backgroundColor: '#1e1e1e' }}>
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center lg:text-left">Gradient Generator</h1>
       <p className="text-gray-300 mb-8 text-center lg:text-left">
         Crea gradientes personalizados con colores dinámicos y expórtalos a TailwindCSS o CSS.
@@ -114,7 +114,7 @@ export default function GradientGenerator() {
       {/* Exportación TailwindCSS */}
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-4">Exportación TailwindCSS</h2>
-        <div className="w-full bg-[#252526] rounded border border-gray-600 p-4 overflow-auto dark-scroll">
+        <div className="w-full bg-[#252526] rounded border border-gray-600 p-4 overflow-auto dark-scroll max-h-48">
           <SyntaxHighlighter
             language="javascript"
             style={vscDarkPlus}
@@ -150,7 +150,7 @@ export default function GradientGenerator() {
       {/* Exportación CSS */}
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-4">Exportación CSS</h2>
-        <div className="w-full bg-[#252526] rounded border border-gray-600 p-4 overflow-auto dark-scroll">
+        <div className="w-full bg-[#252526] rounded border border-gray-600 p-4 overflow-auto dark-scroll max-h-48">
           <SyntaxHighlighter
             language="css"
             style={vscDarkPlus}

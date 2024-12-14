@@ -16,6 +16,9 @@ import HashGenerator from './Pages/HashGenerator';
 import SQLJSONConverter from './Pages/SQLJSONConverter';
 import UUIDGenerator from './Pages/UUIDGenerator';
 import DockerfileGenerator from './Pages/DockerfileGenerator';
+import RegexTester from './Pages/RegexTester';
+import OCRTool from './Pages/OCRTool';
+
 
 export default function App() {
   return (
@@ -37,6 +40,8 @@ export default function App() {
           <Route path="/tools/b/DockerTemplateGen" element={<DockerfileGenerator />} />
           <Route path="/docs" element={<Documentation />} />
           <Route path="/support" element={<Apoyo />} />
+          <Route path="/tools/m/RegexTest" element={<RegexTester />} />
+          <Route path="/tools/m/OCRtool" element={<OCRTool/>} />
         </Routes>
         <Footer />
       </div>
