@@ -11,6 +11,11 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@monaco-editor/react": "^4.7.0-rc.0",
+    "@uiw/codemirror-theme-github": "^4.23.7",
+    "@uiw/codemirror-themes": "^4.23.7",
+    "@uiw/react-codemirror": "^4.23.7",
+    "axios": "^1.7.9",
     "crypto-js": "^4.2.0",
     "csso": "^5.0.5",
     "html-to-image": "^1.11.11",

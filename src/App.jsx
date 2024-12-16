@@ -18,6 +18,8 @@ import UUIDGenerator from './Pages/UUIDGenerator';
 import DockerfileGenerator from './Pages/DockerfileGenerator';
 import RegexTester from './Pages/RegexTester';
 import OCRTool from './Pages/OCRTool';
+import SQLEditor from './Pages/SQLEditor';
+
 
 
 export default function App() {
@@ -42,6 +44,7 @@ export default function App() {
           <Route path="/support" element={<Apoyo />} />
           <Route path="/tools/m/RegexTest" element={<RegexTester />} />
           <Route path="/tools/m/OCRtool" element={<OCRTool/>} />
+          <Route path="/tools/b/SQLeditor" element={<SQLEditor/>} />
         </Routes>
         <Footer />
       </div>
