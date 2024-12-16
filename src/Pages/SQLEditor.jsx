@@ -20,7 +20,7 @@ export default function SQLEditor() {
     setError("");
     setResult(null);
     try {
-      const response = await axios.post("http://localhost:3001/execute-query", {
+      const response = await axios.post("https://mysqltranning.devhelp.dev/execute-query", {
         query
       });
       setResult(response.data.data);
@@ -33,7 +33,7 @@ export default function SQLEditor() {
     const fetchSchemas = async () => {
       setLoadingSchemas(true);
       try {
-        const response = await axios.get("http://localhost:3001/schema");
+        const response = await axios.get("https://mysqltranning.devhelp.dev/schema");
         setSchemas(response.data.schema);
         // Inicializar estado de tablas contraídas
         setExpandedTables(

@@ -44,7 +44,7 @@ export default function App() {
           <Route path="/support" element={<Apoyo />} />
           <Route path="/tools/m/RegexTest" element={<RegexTester />} />
           <Route path="/tools/m/OCRtool" element={<OCRTool/>} />
-          <Route path="/tools/b/SQLeditor" element={<SQLEditor/>} />
+          <Route path="/tools/bd/SQLeditor" element={<SQLEditor/>} />
         </Routes>
         <Footer />
       </div>

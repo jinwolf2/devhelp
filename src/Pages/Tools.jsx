@@ -12,6 +12,7 @@ import {
   CubeIcon,
   MagnifyingGlassIcon,
   DocumentMagnifyingGlassIcon,
+  ServerIcon, // Icono añadido para la sección BBDD
 } from '@heroicons/react/24/outline';
 
 export default function Tools() {
@@ -83,6 +84,16 @@ export default function Tools() {
     },
   ];
 
+  const databaseTools = [
+    {
+      name: 'SQL Editor',
+      path: '/tools/bd/SQLeditor',
+      description:
+        'Edita y prueba tus consultas SQL en tiempo real con conexión a una base de datos compartida.',
+      icon: ServerIcon,
+    },
+  ];
+
   const moreTools = [
     {
       name: 'Regex Test',
@@ -99,9 +110,13 @@ export default function Tools() {
   ];
 
   const toolsToDisplay =
-    activeTab === 'frontend' ? frontendTools :
-    activeTab === 'backend' ? backendTools :
-    moreTools;
+    activeTab === 'frontend'
+      ? frontendTools
+      : activeTab === 'backend'
+      ? backendTools
+      : activeTab === 'database'
+      ? databaseTools
+      : moreTools;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-[#d4d4d4]">
@@ -131,6 +146,16 @@ export default function Tools() {
           } transition`}
         >
           Backend
+        </button>
+        <button
+          onClick={() => setActiveTab('database')}
+          className={`px-6 py-2 rounded ${
+            activeTab === 'database'
+              ? 'bg-[#007acc] text-white'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          } transition`}
+        >
+          BBDD
         </button>
         <button
           onClick={() => setActiveTab('moreTools')}
