@@ -4,7 +4,7 @@ import axios from "axios";
 import {
   TableCellsIcon,
   ChevronDownIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 
 export default function SQLEditor() {
@@ -15,46 +15,62 @@ export default function SQLEditor() {
   const [loadingSchemas, setLoadingSchemas] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Estado del sidebar
   const [expandedTables, setExpandedTables] = useState({}); // Estado de tablas expandidas
+  const [successMessage, setSuccessMessage] = useState("");
 
+  // Función para cargar los schemas
+  const fetchSchemas = async () => {
+    setLoadingSchemas(true);
+    try {
+      const response = await axios.get("https://mysqltranning.devhelp.dev/schema");
+      setSchemas(response.data.schema);
+      setExpandedTables(
+        Object.keys(response.data.schema).reduce((acc, table) => {
+          acc[table] = false;
+          return acc;
+        }, {})
+      );
+    } catch (err) {
+      setError(
+        "Error al cargar los schemas: " +
+          (err.response?.data?.error || err.message)
+      );
+    } finally {
+      setLoadingSchemas(false);
+    }
+  };
+
+  // Llamada inicial para cargar los schemas
+  useEffect(() => {
+    fetchSchemas();
+  }, []);
+
+  // Función para ejecutar consultas
   const executeQuery = async () => {
     setError("");
     setResult(null);
+    setSuccessMessage("");
+
     try {
       const response = await axios.post("https://mysqltranning.devhelp.dev/execute-query", {
-        query
+        query,
       });
-      setResult(response.data.data);
+
+      const isSchemaChangingQuery =
+        /^(CREATE|ALTER|DROP|RENAME|TRUNCATE|INSERT|UPDATE|DELETE)/i.test(query.trim());
+
+      if (isSchemaChangingQuery) {
+        setSuccessMessage("Consulta ejecutada exitosamente. Actualizando esquema...");
+        await fetchSchemas(); // Actualizar el esquema después de una consulta que lo cambia
+      } else {
+        setResult(response.data.data || []);
+        setSuccessMessage("Consulta ejecutada exitosamente.");
+      }
     } catch (err) {
       setError(err.response?.data?.error || "Error desconocido.");
     }
   };
 
-  useEffect(() => {
-    const fetchSchemas = async () => {
-      setLoadingSchemas(true);
-      try {
-        const response = await axios.get("https://mysqltranning.devhelp.dev/schema");
-        setSchemas(response.data.schema);
-        // Inicializar estado de tablas contraídas
-        setExpandedTables(
-          Object.keys(response.data.schema).reduce((acc, table) => {
-            acc[table] = false;
-            return acc;
-          }, {})
-        );
-      } catch (err) {
-        setError(
-          "Error al cargar los schemas: " +
-            (err.response?.data?.error || err.message)
-        );
-      } finally {
-        setLoadingSchemas(false);
-      }
-    };
-
-    fetchSchemas();
-  }, []);
-
+  // Función para expandir/contraer tablas en el esquema
   const toggleTable = (tableName) => {
     setExpandedTables((prev) => ({ ...prev, [tableName]: !prev[tableName] }));
   };
@@ -70,7 +86,7 @@ export default function SQLEditor() {
         <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-gray-600">
           <h2 className="text-lg font-semibold flex items-center space-x-2">
             <TableCellsIcon className="h-6 w-6 text-[#007acc]" />
-            <span>Fake Company</span>
+            <span>Esquema</span>
           </h2>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -153,7 +169,7 @@ export default function SQLEditor() {
             options={{
               fontSize: 14,
               minimap: { enabled: false },
-              wordWrap: "on"
+              wordWrap: "on",
             }}
           />
         </div>
@@ -168,17 +184,27 @@ export default function SQLEditor() {
           </button>
         </div>
 
+        {/* Mensajes de éxito o error */}
+        {successMessage && (
+          <div className="mb-4 text-green-500 font-semibold text-center">
+            {successMessage}
+          </div>
+        )}
+        {error && (
+          <div className="mb-4 text-red-500 font-semibold text-center">
+            {error}
+          </div>
+        )}
+
         {/* Resultados */}
         <div className="mb-6">
           <h2 className="text-xl font-bold mb-2">Resultados:</h2>
-          {error ? (
-            <p className="text-red-500 font-semibold">{error}</p>
-          ) : result ? (
+          {Array.isArray(result) && result.length > 0 ? (
             <div className="overflow-auto max-h-80">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-700 text-white">
-                    {Object.keys(result[0] || {}).map((key) => (
+                    {Object.keys(result[0]).map((key) => (
                       <th
                         key={key}
                         className="border border-gray-600 px-4 py-2 text-left"

@@ -126,44 +126,44 @@ export default function Tools() {
       </p>
 
       {/* Tabs */}
-      <div className="flex justify-center space-x-4 mb-8 flex-wrap">
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-8 ">
         <button
           onClick={() => setActiveTab('frontend')}
-          className={`px-6 py-2 rounded ${
+          className={`px-4 py-2 rounded ${
             activeTab === 'frontend'
               ? 'bg-[#007acc] text-white'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          } transition`}
+          } transition w-1/4 sm:w-auto`}
         >
           Frontend
         </button>
         <button
           onClick={() => setActiveTab('backend')}
-          className={`px-6 py-2 rounded ${
+          className={`px-4 py-2 rounded ${
             activeTab === 'backend'
               ? 'bg-[#007acc] text-white'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          } transition`}
+          } transition w-1/4 sm:w-auto`}
         >
           Backend
         </button>
         <button
           onClick={() => setActiveTab('database')}
-          className={`px-6 py-2 rounded ${
+          className={`px-4 py-2 rounded ${
             activeTab === 'database'
               ? 'bg-[#007acc] text-white'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          } transition`}
+          } transition w-1/4 sm:w-auto`}
         >
           BBDD
         </button>
         <button
           onClick={() => setActiveTab('moreTools')}
-          className={`px-6 py-2 rounded ${
+          className={`px-4 py-2 rounded ${
             activeTab === 'moreTools'
               ? 'bg-[#007acc] text-white'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          } transition`}
+          } transition w-1/4 sm:w-auto`}
         >
           Más
         </button>
