@@ -24,6 +24,7 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.2",
     "react-syntax-highlighter": "^15.6.1",
+    "socket.io-client": "^4.8.1",
     "terser": "^5.37.0",
     "tesseract.js": "^5.1.1",
     "uuid": "^11.0.3"

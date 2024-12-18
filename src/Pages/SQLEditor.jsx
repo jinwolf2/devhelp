@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
+import io from "socket.io-client"; // Importamos socket.io-client
 import axios from "axios";
 import {
   TableCellsIcon,
   ChevronDownIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
+
+const socket = io("localhost:3001"); // Conexión al servidor WebSocket
 
 export default function SQLEditor() {
   const [query, setQuery] = useState("");
@@ -21,7 +24,9 @@ export default function SQLEditor() {
   const fetchSchemas = async () => {
     setLoadingSchemas(true);
     try {
-      const response = await axios.get("https://mysqltranning.devhelp.dev/schema");
+      const response = await axios.get(
+        "https://mysqltranning.devhelp.dev/schema"
+      );
       setSchemas(response.data.schema);
       setExpandedTables(
         Object.keys(response.data.schema).reduce((acc, table) => {
@@ -42,6 +47,16 @@ export default function SQLEditor() {
   // Llamada inicial para cargar los schemas
   useEffect(() => {
     fetchSchemas();
+
+    // Configuración del WebSocket para escuchar eventos de actualización
+    socket.on("schema-updated", (data) => {
+      console.log("Esquema actualizado:", data);
+      fetchSchemas(); // Actualizar los schemas al recibir el evento
+      setSuccessMessage("Esquema actualizado automáticamente.");
+    });
+
+    // Cleanup: desconectar el socket cuando se desmonta el componente
+    return () => socket.disconnect();
   }, []);
 
   // Función para ejecutar consultas
@@ -51,15 +66,20 @@ export default function SQLEditor() {
     setSuccessMessage("");
 
     try {
-      const response = await axios.post("https://mysqltranning.devhelp.dev/execute-query", {
-        query,
-      });
+      const response = await axios.post(
+        "https://mysqltranning.devhelp.dev/execute-query",
+        { query }
+      );
 
       const isSchemaChangingQuery =
-        /^(CREATE|ALTER|DROP|RENAME|TRUNCATE|INSERT|UPDATE|DELETE)/i.test(query.trim());
+        /^(CREATE|ALTER|DROP|RENAME|TRUNCATE|INSERT|UPDATE|DELETE)/i.test(
+          query.trim()
+        );
 
       if (isSchemaChangingQuery) {
-        setSuccessMessage("Consulta ejecutada exitosamente. Actualizando esquema...");
+        setSuccessMessage(
+          "Consulta ejecutada exitosamente. Actualizando esquema..."
+        );
         await fetchSchemas(); // Actualizar el esquema después de una consulta que lo cambia
       } else {
         setResult(response.data.data || []);
@@ -151,11 +171,6 @@ export default function SQLEditor() {
             <strong>INSERT</strong>, <strong>UPDATE</strong>, y{" "}
             <strong>CREATE TABLE</strong>.
           </p>
-          <p className="mt-2">
-            <strong>Nota:</strong> La base de datos se restablece cada 24 horas
-            y es compartida con otros usuarios, por lo que los cambios no son
-            permanentes.
-          </p>
         </div>
 
         {/* Editor de SQL */}
@@ -184,7 +199,7 @@ export default function SQLEditor() {
           </button>
         </div>
 
-        {/* Mensajes de éxito o error */}
+        {/* Mensajes */}
         {successMessage && (
           <div className="mb-4 text-green-500 font-semibold text-center">
             {successMessage}
@@ -195,48 +210,6 @@ export default function SQLEditor() {
             {error}
           </div>
         )}
-
-        {/* Resultados */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold mb-2">Resultados:</h2>
-          {Array.isArray(result) && result.length > 0 ? (
-            <div className="overflow-auto max-h-80">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-700 text-white">
-                    {Object.keys(result[0]).map((key) => (
-                      <th
-                        key={key}
-                        className="border border-gray-600 px-4 py-2 text-left"
-                      >
-                        {key}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.map((row, index) => (
-                    <tr
-                      key={index}
-                      className="odd:bg-[#252526] even:bg-[#1e1e1e]"
-                    >
-                      {Object.values(row).map((value, i) => (
-                        <td
-                          key={i}
-                          className="border border-gray-600 px-4 py-2"
-                        >
-                          {value}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-gray-400">No hay resultados para mostrar.</p>
-          )}
-        </div>
       </div>
     </div>
   );
