@@ -1,32 +1,27 @@
 import React, { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
-import io from "socket.io-client"; // Importamos socket.io-client
+import io from "socket.io-client";
 import axios from "axios";
 import {
-  TableCellsIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  PlayIcon,
+  Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 
-const socket = io("localhost:3001"); // Conexión al servidor WebSocket
+const socket = io("https://mysqltranning.devhelp.dev");
 
 export default function SQLEditor() {
   const [query, setQuery] = useState("");
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState([]);
   const [error, setError] = useState("");
-  const [schemas, setSchemas] = useState(null);
-  const [loadingSchemas, setLoadingSchemas] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Estado del sidebar
-  const [expandedTables, setExpandedTables] = useState({}); // Estado de tablas expandidas
+  const [schemas, setSchemas] = useState({});
+  const [expandedTables, setExpandedTables] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Función para cargar los schemas
   const fetchSchemas = async () => {
-    setLoadingSchemas(true);
     try {
-      const response = await axios.get(
-        "https://mysqltranning.devhelp.dev/schema"
-      );
+      const response = await axios.get("https://mysqltranning.devhelp.dev/schema");
       setSchemas(response.data.schema);
       setExpandedTables(
         Object.keys(response.data.schema).reduce((acc, table) => {
@@ -35,181 +30,187 @@ export default function SQLEditor() {
         }, {})
       );
     } catch (err) {
-      setError(
-        "Error al cargar los schemas: " +
-          (err.response?.data?.error || err.message)
-      );
-    } finally {
-      setLoadingSchemas(false);
+      setError("Error al cargar el esquema: " + err.message);
     }
   };
 
-  // Llamada inicial para cargar los schemas
   useEffect(() => {
     fetchSchemas();
-
-    // Configuración del WebSocket para escuchar eventos de actualización
-    socket.on("schema-updated", (data) => {
-      console.log("Esquema actualizado:", data);
-      fetchSchemas(); // Actualizar los schemas al recibir el evento
-      setSuccessMessage("Esquema actualizado automáticamente.");
+    socket.on("schema-updated", () => {
+      fetchSchemas();
+      setSuccessMessage("El esquema se actualizó automáticamente.");
     });
-
-    // Cleanup: desconectar el socket cuando se desmonta el componente
-    return () => socket.disconnect();
+    return () => socket.off("schema-updated");
   }, []);
 
-  // Función para ejecutar consultas
   const executeQuery = async () => {
     setError("");
-    setResult(null);
     setSuccessMessage("");
-
     try {
       const response = await axios.post(
         "https://mysqltranning.devhelp.dev/execute-query",
         { query }
       );
 
-      const isSchemaChangingQuery =
-        /^(CREATE|ALTER|DROP|RENAME|TRUNCATE|INSERT|UPDATE|DELETE)/i.test(
-          query.trim()
-        );
-
-      if (isSchemaChangingQuery) {
-        setSuccessMessage(
-          "Consulta ejecutada exitosamente. Actualizando esquema..."
-        );
-        await fetchSchemas(); // Actualizar el esquema después de una consulta que lo cambia
-      } else {
-        setResult(response.data.data || []);
-        setSuccessMessage("Consulta ejecutada exitosamente.");
-      }
+      const data = response.data.data || [];
+      // data puede ser un array de arrays (múltiples resultados)
+      // o un array simple (un solo resultado)
+      setResult(data);
+      setSuccessMessage("Consulta ejecutada exitosamente.");
     } catch (err) {
-      setError(err.response?.data?.error || "Error desconocido.");
+      setError(err.response?.data?.error || "Error al ejecutar la consulta.");
     }
   };
 
-  // Función para expandir/contraer tablas en el esquema
   const toggleTable = (tableName) => {
-    setExpandedTables((prev) => ({ ...prev, [tableName]: !prev[tableName] }));
+    setExpandedTables((prev) => ({
+      ...prev,
+      [tableName]: !prev[tableName],
+    }));
   };
 
-  return (
-    <div className="flex flex-col sm:flex-row">
-      {/* Sidebar */}
-      <div
-        className={`bg-[#252526] text-gray-200 border-r border-gray-600 sm:w-64 ${
-          isSidebarOpen ? "w-full sm:w-64" : "w-0 sm:w-12"
-        } transition-all duration-300`}
-      >
-        <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-gray-600">
-          <h2 className="text-lg font-semibold flex items-center space-x-2">
-            <TableCellsIcon className="h-6 w-6 text-[#007acc]" />
-            <span>Esquema</span>
-          </h2>
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="text-sm px-2 py-1 bg-[#007acc] text-white rounded hover:bg-[#0587d6] transition"
-          >
-            {isSidebarOpen ? "x" : "^"}
-          </button>
-        </div>
-        {isSidebarOpen && (
-          <div className="overflow-auto max-h-[calc(100vh-4rem)] p-4">
-            {loadingSchemas ? (
-              <p className="text-gray-400">Cargando esquema...</p>
-            ) : schemas ? (
-              <ul className="space-y-4">
-                {Object.entries(schemas).map(([tableName, columns]) => (
-                  <li key={tableName}>
-                    <div
-                      className="flex items-center justify-between cursor-pointer"
-                      onClick={() => toggleTable(tableName)}
-                    >
-                      <span className="flex items-center space-x-2">
-                        <TableCellsIcon className="h-5 w-5 text-[#007acc]" />
-                        <strong className="text-[#007acc]">{tableName}</strong>
-                      </span>
-                      {expandedTables[tableName] ? (
-                        <ChevronDownIcon className="h-5 w-5" />
-                      ) : (
-                        <ChevronRightIcon className="h-5 w-5" />
-                      )}
-                    </div>
-                    {expandedTables[tableName] && (
-                      <ul className="list-disc ml-6 text-sm space-y-1 mt-2">
-                        {columns.map((column, i) => (
-                          <li key={i}>
-                            <strong>{column.columnName}</strong> -{" "}
-                            {column.dataType} (
-                            {column.isNullable === "NO"
-                              ? "NOT NULL"
-                              : "NULLABLE"}
-                            )
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
+  // Función para renderizar una tabla de resultados
+  const renderTable = (rows, resultIndex = null) => {
+    if (!rows || rows.length === 0) {
+      return <p className="text-gray-400">No hay resultados para mostrar.</p>;
+    }
+
+    const keys = Object.keys(rows[0]);
+
+    return (
+      <div className="overflow-auto rounded border border-[#333333] mb-4">
+        {resultIndex !== null && (
+          <h3 className="text-white font-semibold mb-2 p-2 bg-[#252525] border-b border-[#333333]">
+            Resultado {resultIndex + 1}:
+          </h3>
+        )}
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-[#333333] text-white">
+              {keys.map((key) => (
+                <th
+                  key={key}
+                  className="px-3 py-2 text-left border-b border-[#2a2a2a]"
+                >
+                  {key}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr
+                key={i}
+                className="odd:bg-[#2a2a2a] even:bg-[#252525] hover:bg-[#333333] transition"
+              >
+                {Object.values(row).map((value, index) => (
+                  <td
+                    key={index}
+                    className="px-3 py-2 truncate border-b border-[#2a2a2a]"
+                  >
+                    {typeof value === "object" && value !== null
+                      ? JSON.stringify(value)
+                      : value}
+                  </td>
                 ))}
-              </ul>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Verificar si result es un array de arrays (múltiples resultados) o un solo array
+  const isMultipleResults = Array.isArray(result) && result.length > 0 && Array.isArray(result[0]);
+
+  return (
+    <div className="h-screen flex flex-col bg-[#1e1e1e] text-gray-200">
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-3 bg-[#252526] border-b border-[#333333]">
+        <h1 className="text-xl font-semibold text-white flex items-center space-x-2">
+          <span>SQL Playground</span>
+        </h1>
+
+        <button
+          onClick={executeQuery}
+          className="flex items-center space-x-2 px-5 py-2 bg-[#007acc] rounded hover:bg-[#0587d6] text-white transition font-medium"
+          title="Ejecutar Consulta"
+        >
+          <PlayIcon className="h-5 w-5" />
+          <span>Ejecutar</span>
+        </button>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar (sin lógica de reducción, ancho fijo) */}
+        <aside className="w-64 bg-[#252526] flex flex-col border-r border-[#333333] overflow-hidden">
+          <div className="p-4 flex items-center space-x-2 bg-[#007acc] text-white">
+            <Squares2X2Icon className="h-5 w-5" />
+            <h2 className="text-lg font-semibold">Esquema</h2>
+          </div>
+          <div className="overflow-auto flex-1">
+            {Object.entries(schemas).map(([table, columns]) => (
+              <div key={table}>
+                <div
+                  onClick={() => toggleTable(table)}
+                  className="flex items-center justify-between p-2 hover:bg-[#333333] cursor-pointer"
+                >
+                  <span className="truncate text-sm">{table}</span>
+                  {expandedTables[table] ? (
+                    <ChevronDownIcon className="h-4 w-4" />
+                  ) : (
+                    <ChevronRightIcon className="h-4 w-4" />
+                  )}
+                </div>
+                {expandedTables[table] && (
+                  <ul className="pl-4 pb-2 text-xs text-gray-400 space-y-1">
+                    {columns.map((col, index) => (
+                      <li key={index} className="truncate">
+                        {col.columnName} ({col.dataType})
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex flex-col flex-1">
+          {/* Editor Section */}
+          <div className="flex-1 flex flex-col border-b border-[#333333]">
+            <div className="flex-1 relative">
+              <Editor
+                height="100%"
+                defaultLanguage="sql"
+                defaultValue="-- Escribe tu consulta SQL aquí"
+                onChange={(value) => setQuery(value)}
+                theme="vs-dark"
+              />
+            </div>
+          </div>
+
+          {/* Results Section */}
+          <div className="h-64 overflow-auto bg-[#1e1e1e] p-4">
+            <h2 className="text-lg font-semibold mb-2 text-white">Resultados:</h2>
+            {error && <p className="text-red-500 mb-2">{error}</p>}
+            {successMessage && <p className="text-green-500 mb-2">{successMessage}</p>}
+
+            {Array.isArray(result) && result.length > 0 ? (
+              isMultipleResults ? (
+                // Múltiples conjuntos de resultados
+                result.map((rows, idx) => renderTable(rows, idx))
+              ) : (
+                // Un solo conjunto de resultados
+                renderTable(result)
+              )
             ) : (
-              <p className="text-gray-400">No hay esquema disponible.</p>
+              <p className="text-gray-400">No hay resultados para mostrar.</p>
             )}
           </div>
-        )}
-      </div>
-
-      {/* Main Editor */}
-      <div className="flex-1 p-4">
-        <h1 className="text-3xl font-bold mb-6 text-center">SQL Editor</h1>
-        <div className="text-gray-300 mb-6 text-center">
-          <p>
-            Escribe y ejecuta consultas SQL contra tu base de datos compartida.
-            Puedes realizar operaciones <strong>SELECT</strong>,{" "}
-            <strong>INSERT</strong>, <strong>UPDATE</strong>, y{" "}
-            <strong>CREATE TABLE</strong>.
-          </p>
-        </div>
-
-        {/* Editor de SQL */}
-        <div className="mb-6">
-          <Editor
-            height="40vh"
-            defaultLanguage="sql"
-            defaultValue="-- Escribe tu consulta SQL aquí"
-            onChange={(value) => setQuery(value)}
-            theme="vs-dark"
-            options={{
-              fontSize: 14,
-              minimap: { enabled: false },
-              wordWrap: "on",
-            }}
-          />
-        </div>
-
-        {/* Botón para ejecutar consulta */}
-        <div className="text-center mb-6">
-          <button
-            onClick={executeQuery}
-            className="px-6 py-2 bg-[#007acc] text-white rounded hover:bg-[#0587d6] transition text-lg w-full sm:w-auto"
-          >
-            Ejecutar Consulta
-          </button>
-        </div>
-
-        {/* Mensajes */}
-        {successMessage && (
-          <div className="mb-4 text-green-500 font-semibold text-center">
-            {successMessage}
-          </div>
-        )}
-        {error && (
-          <div className="mb-4 text-red-500 font-semibold text-center">
-            {error}
-          </div>
-        )}
+        </main>
       </div>
     </div>
   );
