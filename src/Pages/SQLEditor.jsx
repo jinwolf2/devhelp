@@ -41,6 +41,7 @@ export default function SQLEditor() {
       .then((res) => res.json())
       .then((data) => {
         setPublicIp(data.ip);
+        console.log("IP pública obtenida:", data.ip); // Log para debug
       })
       .catch((err) => console.error("Error obteniendo la IP pública:", err));
   }, []);
@@ -61,7 +62,7 @@ export default function SQLEditor() {
     try {
       const response = await axios.post(
         "https://mysqltranning.devhelp.dev/execute-query",
-        { query, clientIp: publicIp } // Enviamos también la IP pública
+        { query, clientIp: publicIp }
       );
       const data = response.data.data || [];
       setResult(data);
@@ -242,7 +243,7 @@ export default function SQLEditor() {
                 // Múltiples conjuntos de resultados
                 result.map((rows, idx) => renderResultSet(rows, idx))
               ) : (
-                // Un solo conjunto de resultados o un solo objeto
+                // Un solo conjunto de resultados
                 renderResultSet(result)
               )
             ) : (
