@@ -46,15 +46,13 @@ export default function SQLEditor() {
   const executeQuery = async () => {
     setError("");
     setSuccessMessage("");
+    setResult([]);
     try {
       const response = await axios.post(
         "https://mysqltranning.devhelp.dev/execute-query",
         { query }
       );
-
       const data = response.data.data || [];
-      // data puede ser un array de arrays (múltiples resultados)
-      // o un array simple (un solo resultado)
       setResult(data);
       setSuccessMessage("Consulta ejecutada exitosamente.");
     } catch (err) {
@@ -69,19 +67,54 @@ export default function SQLEditor() {
     }));
   };
 
-  // Función para renderizar una tabla de resultados
-  const renderTable = (rows, resultIndex = null) => {
-    if (!rows || rows.length === 0) {
-      return <p className="text-gray-400">No hay resultados para mostrar.</p>;
+  // Función para determinar cómo renderizar cada resultado
+  const renderResultSet = (rows, index = null) => {
+    if (!Array.isArray(rows)) {
+      // No es un array, puede ser un valor inusual
+      return (
+        <div className="rounded border border-[#333333] mb-4 p-2 text-white">
+          {index !== null && (
+            <h3 className="font-semibold mb-2">Resultado {index + 1}:</h3>
+          )}
+          <p>{JSON.stringify(rows)}</p>
+        </div>
+      );
     }
 
-    const keys = Object.keys(rows[0]);
+    if (rows.length === 0) {
+      return (
+        <div className="rounded border border-[#333333] mb-4 p-2 text-gray-400">
+          {index !== null && (
+            <h3 className="text-white font-semibold mb-2">Resultado {index + 1}:</h3>
+          )}
+          No hay resultados para mostrar.
+        </div>
+      );
+    }
 
+    // Si el primer elemento es un OkPacket (por ejemplo en UPDATE)
+    const first = rows[0];
+    if (
+      typeof first === "object" &&
+      (Object.hasOwn(first, "affectedRows") || Object.hasOwn(first, "insertId"))
+    ) {
+      return (
+        <div className="rounded border border-[#333333] mb-4 p-2 text-white">
+          {index !== null && (
+            <h3 className="font-semibold mb-2">Resultado {index + 1}:</h3>
+          )}
+          <p>Consulta ejecutada. Filas afectadas: {first.affectedRows ?? 0}</p>
+        </div>
+      );
+    }
+
+    // Caso normal: resultado de SELECT
+    const keys = Object.keys(first);
     return (
       <div className="overflow-auto rounded border border-[#333333] mb-4">
-        {resultIndex !== null && (
+        {index !== null && (
           <h3 className="text-white font-semibold mb-2 p-2 bg-[#252525] border-b border-[#333333]">
-            Resultado {resultIndex + 1}:
+            Resultado {index + 1}:
           </h3>
         )}
         <table className="w-full text-sm border-collapse">
@@ -121,7 +154,6 @@ export default function SQLEditor() {
     );
   };
 
-  // Verificar si result es un array de arrays (múltiples resultados) o un solo array
   const isMultipleResults = Array.isArray(result) && result.length > 0 && Array.isArray(result[0]);
 
   return (
@@ -143,7 +175,7 @@ export default function SQLEditor() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar (sin lógica de reducción, ancho fijo) */}
+        {/* Sidebar */}
         <aside className="w-64 bg-[#252526] flex flex-col border-r border-[#333333] overflow-hidden">
           <div className="p-4 flex items-center space-x-2 bg-[#007acc] text-white">
             <Squares2X2Icon className="h-5 w-5" />
@@ -201,10 +233,10 @@ export default function SQLEditor() {
             {Array.isArray(result) && result.length > 0 ? (
               isMultipleResults ? (
                 // Múltiples conjuntos de resultados
-                result.map((rows, idx) => renderTable(rows, idx))
+                result.map((rows, idx) => renderResultSet(rows, idx))
               ) : (
-                // Un solo conjunto de resultados
-                renderTable(result)
+                // Un solo conjunto de resultados o un solo objeto
+                renderResultSet(result)
               )
             ) : (
               <p className="text-gray-400">No hay resultados para mostrar.</p>
