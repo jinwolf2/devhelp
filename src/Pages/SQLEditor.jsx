@@ -18,6 +18,7 @@ export default function SQLEditor() {
   const [schemas, setSchemas] = useState({});
   const [expandedTables, setExpandedTables] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [publicIp, setPublicIp] = useState("");
 
   const fetchSchemas = async () => {
     try {
@@ -33,6 +34,16 @@ export default function SQLEditor() {
       setError("Error al cargar el esquema: " + err.message);
     }
   };
+
+  // Obtener la IP pública del cliente
+  useEffect(() => {
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => {
+        setPublicIp(data.ip);
+      })
+      .catch((err) => console.error("Error obteniendo la IP pública:", err));
+  }, []);
 
   useEffect(() => {
     fetchSchemas();
@@ -50,7 +61,7 @@ export default function SQLEditor() {
     try {
       const response = await axios.post(
         "https://mysqltranning.devhelp.dev/execute-query",
-        { query }
+        { query, clientIp: publicIp } // Enviamos también la IP pública
       );
       const data = response.data.data || [];
       setResult(data);
@@ -67,10 +78,8 @@ export default function SQLEditor() {
     }));
   };
 
-  // Función para determinar cómo renderizar cada resultado
   const renderResultSet = (rows, index = null) => {
     if (!Array.isArray(rows)) {
-      // No es un array, puede ser un valor inusual
       return (
         <div className="rounded border border-[#333333] mb-4 p-2 text-white">
           {index !== null && (
@@ -92,7 +101,6 @@ export default function SQLEditor() {
       );
     }
 
-    // Si el primer elemento es un OkPacket (por ejemplo en UPDATE)
     const first = rows[0];
     if (
       typeof first === "object" &&
@@ -108,7 +116,6 @@ export default function SQLEditor() {
       );
     }
 
-    // Caso normal: resultado de SELECT
     const keys = Object.keys(first);
     return (
       <div className="overflow-auto rounded border border-[#333333] mb-4">
