@@ -9,21 +9,32 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 
+// Conecta con el servidor Socket.io
 const socket = io("https://mysqltranning.devhelp.dev");
 
 export default function SQLEditor() {
+  // Estado para la consulta actual
   const [query, setQuery] = useState("");
+  // Estado para el resultado (puede ser un array de resultados)
   const [result, setResult] = useState([]);
+  // Estado para manejar mensajes de error
   const [error, setError] = useState("");
+  // Estado para el esquema de la base de datos
   const [schemas, setSchemas] = useState({});
+  // Estado para manejar qué tablas están expandidas
   const [expandedTables, setExpandedTables] = useState({});
+  // Estado para mensajes de éxito (por ejemplo: "Consulta ejecutada exitosamente")
   const [successMessage, setSuccessMessage] = useState("");
+  // Estado para almacenar la IP pública del cliente
   const [publicIp, setPublicIp] = useState("");
 
+  // Función para obtener el esquema de la base de datos
   const fetchSchemas = async () => {
     try {
       const response = await axios.get("https://mysqltranning.devhelp.dev/schema");
       setSchemas(response.data.schema);
+
+      // Inicializamos el estado de expansión de tablas en false
       setExpandedTables(
         Object.keys(response.data.schema).reduce((acc, table) => {
           acc[table] = false;
@@ -35,7 +46,7 @@ export default function SQLEditor() {
     }
   };
 
-  // Obtener la IP pública del cliente
+  // Obtener la IP pública del cliente desde un servicio externo
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
@@ -46,6 +57,7 @@ export default function SQLEditor() {
       .catch((err) => console.error("Error obteniendo la IP pública:", err));
   }, []);
 
+  // Montar el esquema y establecer escucha de "schema-updated" vía sockets
   useEffect(() => {
     fetchSchemas();
     socket.on("schema-updated", () => {
@@ -55,11 +67,13 @@ export default function SQLEditor() {
     return () => socket.off("schema-updated");
   }, []);
 
+  // Ejecutar la consulta SQL enviada por el usuario
   const executeQuery = async () => {
     setError("");
     setSuccessMessage("");
     setResult([]);
     try {
+      // Enviamos la consulta y la IP pública al backend
       const response = await axios.post(
         "https://mysqltranning.devhelp.dev/execute-query",
         { query, clientIp: publicIp }
@@ -72,6 +86,7 @@ export default function SQLEditor() {
     }
   };
 
+  // Alternar la visualización de las columnas de una tabla en el sidebar
   const toggleTable = (tableName) => {
     setExpandedTables((prev) => ({
       ...prev,
@@ -79,8 +94,16 @@ export default function SQLEditor() {
     }));
   };
 
+  // Función auxiliar para renderizar un conjunto de resultados
   const renderResultSet = (rows, index = null) => {
+    // rows puede ser:
+    // - Un array vacío (no hay resultados)
+    // - Un array de objetos (resultado de SELECT)
+    // - Un array con un "OkPacket" (resultado de UPDATE/INSERT/DELETE)
+    // - Un objeto no array, que convertiremos a JSON
+
     if (!Array.isArray(rows)) {
+      // Si no es un array, lo mostramos como JSON
       return (
         <div className="rounded border border-[#333333] mb-4 p-2 text-white">
           {index !== null && (
@@ -92,6 +115,7 @@ export default function SQLEditor() {
     }
 
     if (rows.length === 0) {
+      // Sin filas
       return (
         <div className="rounded border border-[#333333] mb-4 p-2 text-gray-400">
           {index !== null && (
@@ -102,11 +126,13 @@ export default function SQLEditor() {
       );
     }
 
+    // Si el primer elemento es un "OkPacket" (UPDATE/INSERT)
     const first = rows[0];
     if (
       typeof first === "object" &&
       (Object.hasOwn(first, "affectedRows") || Object.hasOwn(first, "insertId"))
     ) {
+      // Mostrar filas afectadas
       return (
         <div className="rounded border border-[#333333] mb-4 p-2 text-white">
           {index !== null && (
@@ -117,6 +143,7 @@ export default function SQLEditor() {
       );
     }
 
+    // Caso general: resultado de SELECT
     const keys = Object.keys(first);
     return (
       <div className="overflow-auto rounded border border-[#333333] mb-4">
@@ -162,6 +189,7 @@ export default function SQLEditor() {
     );
   };
 
+  // Verificar si hay múltiples resultados
   const isMultipleResults = Array.isArray(result) && result.length > 0 && Array.isArray(result[0]);
 
   return (
